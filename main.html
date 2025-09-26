@@ -36,54 +36,34 @@
 
 <script>
 //Your code goes here 
-	const container = document.getElementById("container");
-    const items = document.querySelectorAll(".item");
+   const slider = document.querySelector('.items');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
 
-    let activeItem = null;
-    let offsetX = 0, offsetY = 0;
-
-    
-    const cols = 5;
-    const size = container.clientWidth / cols - 20; 
-    items.forEach((item, i) => {
-      const row = Math.floor(i / cols);
-      const col = i % cols;
-      item.style.width = size + "px";
-      item.style.height = size + "px";
-      item.style.left = col * (size + 10) + 10 + "px";
-      item.style.top = row * (size + 10) + 10 + "px";
+    slider.addEventListener('mousedown', (e) => {
+      isDown = true;
+      slider.classList.add('active');
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
     });
 
-    items.forEach(item => {
-      item.addEventListener("mousedown", e => {
-        activeItem = item;
-        offsetX = e.clientX - item.offsetLeft;
-        offsetY = e.clientY - item.offsetTop;
-        item.style.zIndex = 1000; // bring to front
-      });
+    slider.addEventListener('mouseleave', () => {
+      isDown = false;
+      slider.classList.remove('active');
     });
 
-    document.addEventListener("mousemove", e => {
-      if (!activeItem) return;
-
-      const rect = container.getBoundingClientRect();
-
-      let newLeft = e.clientX - rect.left - offsetX;
-      let newTop = e.clientY - rect.top - offsetY;
-
-      
-      newLeft = Math.max(0, Math.min(newLeft, rect.width - activeItem.offsetWidth));
-      newTop = Math.max(0, Math.min(newTop, rect.height - activeItem.offsetHeight));
-
-      activeItem.style.left = newLeft + "px";
-      activeItem.style.top = newTop + "px";
+    slider.addEventListener('mouseup', () => {
+      isDown = false;
+      slider.classList.remove('active');
     });
 
-    document.addEventListener("mouseup", () => {
-      if (activeItem) {
-        activeItem.style.zIndex = 1;
-        activeItem = null;
-      }
+    slider.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - slider.offsetLeft;
+      const walk = (x - startX) * 2; // scroll speed
+      slider.scrollLeft = scrollLeft - walk;
     });
 </script>
 
